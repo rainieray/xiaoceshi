@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>或许TA是异世界的你？！</title>
+  <style>
+    :root {
+      --gold: #E0C070;
+      --gold-light: #F0D898;
+      --gold-deep: #B89A4A;
+      --gold-dim: #7A6530;
+      --black: #080A0D;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--gold);
+      font-family: "Songti SC", "STSong", "SimSun", "Noto Serif SC", Georgia, serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 背景细微金色光晕 */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 38%, rgba(224, 192, 112, 0.10), transparent 55%),
+        radial-gradient(circle at 50% 100%, rgba(224, 192, 112, 0.05), transparent 60%);
+      pointer-events: none;
+    }
+
+    .stage {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      width: min(720px, 100%);
+      animation: rise 0.9s ease both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 标题行 */
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(12px, 3vw, 26px);
+      flex-wrap: nowrap;
+    }
+
+    .star {
+      width: clamp(26px, 5vw, 42px);
+      height: clamp(26px, 5vw, 42px);
+      flex: 0 0 auto;
+      color: var(--gold);
+      filter: drop-shadow(0 0 10px rgba(224, 192, 112, 0.55));
+      animation: twinkle 3s ease-in-out infinite;
+    }
+
+    .star:last-of-type {
+      animation-delay: 1.5s;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 1;    transform: scale(1); }
+      50%      { opacity: 0.65; transform: scale(0.9); }
+    }
+
+    h1 {
+      font-size: clamp(22px, 5.2vw, 44px);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.35;
+      color: var(--gold-light);
+      text-shadow:
+        0 0 18px rgba(224, 192, 112, 0.45),
+        0 0 42px rgba(224, 192, 112, 0.18);
+      white-space: nowrap;
+    }
+
+    /* 分隔线与小标题 */
+    .divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin: clamp(20px, 4vw, 34px) auto 0;
+      width: min(420px, 80%);
+    }
+
+    .divider .line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-deep), transparent);
+      opacity: 0.7;
+    }
+
+    .divider .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 10px rgba(224, 192, 112, 0.8);
+    }
+
+    .subtitle {
+      margin-top: clamp(16px, 3vw, 24px);
+      font-size: clamp(13px, 2.6vw, 17px);
+      letter-spacing: 0.32em;
+      text-indent: 0.32em;
+      color: var(--gold);
+      opacity: 0.9;
+    }
+
+    /* 开始按钮 */
+    .start-btn {
+      margin-top: clamp(38px, 7vw, 64px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px 52px;
+      font-family: inherit;
+      font-size: clamp(15px, 2.6vw, 18px);
+      letter-spacing: 0.22em;
+      text-indent: 0.22em;
+      color: var(--gold-light);
+      background: transparent;
+      border: 1px solid var(--gold);
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+      box-shadow: 0 0 0 rgba(224, 192, 112, 0);
+    }
+
+    .start-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, var(--gold-deep), var(--gold), var(--gold-light));
+      transform: translateX(-101%);
+      transition: transform 0.45s ease;
+      z-index: -1;
+    }
+
+    .start-btn:hover {
+      color: var(--black);
+      border-color: var(--gold-light);
+      box-shadow: 0 0 26px rgba(224, 192, 112, 0.45);
+    }
+
+    .start-btn:hover::before {
+      transform: translateX(0);
+    }
+
+    .start-btn:active {
+      transform: translateY(1px);
+    }
+
+    .start-btn:focus-visible {
+      outline: 2px solid var(--gold-light);
+      outline-offset: 4px;
+    }
+
+    /* 底部装饰文字 */
+    .footer-note {
+      margin-top: clamp(44px, 8vw, 80px);
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      text-indent: 0.28em;
+      color: var(--gold-dim);
+      opacity: 0.75;
+    }
+
+    @media (max-width: 420px) {
+      h1 {
+        white-space: normal;
+      }
+      .start-btn {
+        padding: 14px 34px;
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stage, .star { animation: none; }
+      .start-btn, .start-btn::before { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <div class="title-row">
+      <!-- 左侧星星 -->
+      <svg class="star" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M12 1.6l2.9 6.5 7.1.7-5.3 4.8 1.5 7-6.2-3.6-6.2 3.6 1.5-7L2 8.8l7.1-.7L12 1.6z"/>
+      </svg>
+
+      <h1>或许TA是异世界的你？！</h1>
+
+      <!-- 右侧星星 -->
+      <svg class="star" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M12 1.6l2.9 6.5 7.1.7-5.3 4.8 1.5 7-6.2-3.6-6.2 3.6 1.5-7L2 8.8l7.1-.7L12 1.6z"/>
+      </svg>
+    </div>
+
+    <div class="divider" aria-hidden="true">
+      <span class="line"></span>
+      <span class="dot"></span>
+      <span class="line"></span>
+    </div>
+
+    <p class="subtitle">· 九域大陆人物小测试 ·</p>
+
+    <button id="startBtn" class="start-btn" type="button">开始测试</button>
+
+    <p class="footer-note">九域大陆 · 命运之镜</p>
+  </main>
+
+  <script>
+    document.getElementById("startBtn").addEventListener("click", () => {
+      // 试题使用子页面，暂未创建，先跳转到占位地址
+      window.location.href = "quiz.html";
+    });
+  </script>
+</body>
+</html>
