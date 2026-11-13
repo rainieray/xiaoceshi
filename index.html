@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>或许TA是异世界的你？！</title>
   <style>
+    /* 完全提取自你提供的排版文件色系与字体 */
     :root {
-      --gold: #E0C070;
-      --gold-light: #F0D898;
-      --gold-deep: #B89A4A;
-      --gold-dim: #7A6530;
-      --black: #080A0D;
+      --paper: #d1c7b7;
+      --ink: #f7eedf;
+      --bg: #141315;
+      --line-heavy: rgba(209, 199, 183, 0.4);
+      --line-light: rgba(209, 199, 183, 0.2);
+      --line-faint: rgba(209, 199, 183, 0.08);
     }
 
     * {
@@ -19,231 +21,329 @@
       padding: 0;
     }
 
-    html, body {
-      height: 100%;
-    }
-
     body {
-      background: var(--black);
-      color: var(--gold);
-      font-family: "Songti SC", "STSong", "SimSun", "Noto Serif SC", Georgia, serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background-color: var(--bg);
+      color: var(--paper);
+      font-family: "Georgia", "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
       min-height: 100vh;
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* 背景细微金色光晕 */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 50% 38%, rgba(224, 192, 112, 0.10), transparent 55%),
-        radial-gradient(circle at 50% 100%, rgba(224, 192, 112, 0.05), transparent 60%);
-      pointer-events: none;
-    }
-
-    .stage {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      width: min(720px, 100%);
-      animation: rise 0.9s ease both;
-    }
-
-    @keyframes rise {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* 标题行 */
-    .title-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: clamp(12px, 3vw, 26px);
-      flex-wrap: nowrap;
+      padding: 24px;
+      /* 模拟极淡的复古排版网格背景 */
+      background-image: 
+        linear-gradient(var(--line-faint) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line-faint) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: center center;
     }
 
-    .star {
-      width: clamp(26px, 5vw, 42px);
-      height: clamp(26px, 5vw, 42px);
-      flex: 0 0 auto;
-      color: var(--gold);
-      filter: drop-shadow(0 0 10px rgba(224, 192, 112, 0.55));
-      animation: twinkle 3s ease-in-out infinite;
+    /* 主体档案容器，融合了文件中的矩阵与装订线概念 */
+    .archive-matrix {
+      position: relative;
+      width: min(580px, 100%);
+      background: var(--bg);
+      border: 1px solid var(--line-heavy);
+      padding: 46px 30px 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
     }
 
-    .star:last-of-type {
-      animation-delay: 1.5s;
+    /* 顶部打字机索引条 */
+    .lead-strip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 0.5px solid var(--line-light);
+      padding: 10px 20px;
+      font-family: monospace;
+      font-size: 7px;
+      letter-spacing: 1.5px;
+      color: rgba(209, 199, 183, 0.45);
+    }
+    
+    .lead-strip span:last-child {
+      color: var(--ink);
+      font-weight: 700;
     }
 
-    @keyframes twinkle {
-      0%, 100% { opacity: 1;    transform: scale(1); }
-      50%      { opacity: 0.65; transform: scale(0.9); }
+    /* 标题区 */
+    .title-container {
+      margin-top: 20px;
+      margin-bottom: 12px;
+    }
+
+    .title-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-family: "Didot", "Bodoni MT", serif;
+      font-style: italic;
+      font-size: 8.5px;
+      letter-spacing: 2px;
+      color: rgba(209, 199, 183, 0.4);
+      margin-bottom: 14px;
+    }
+
+    .title-kicker::before, .title-kicker::after {
+      content: "";
+      width: 30px;
+      height: 1px;
+      background: var(--line-light);
+    }
+
+    .headline-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+    }
+
+    .star-icon {
+      width: 22px;
+      height: 22px;
+      color: var(--paper);
+      animation: breathSlow 8.8s ease-in-out infinite;
+    }
+
+    .star-icon:last-of-type {
+      animation-delay: 4.4s;
+    }
+
+    @keyframes breathSlow {
+      0%, 100% { opacity: 0.4; transform: scale(0.96); }
+      50% { opacity: 1; transform: scale(1.04); }
     }
 
     h1 {
-      font-size: clamp(22px, 5.2vw, 44px);
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      line-height: 1.35;
-      color: var(--gold-light);
-      text-shadow:
-        0 0 18px rgba(224, 192, 112, 0.45),
-        0 0 42px rgba(224, 192, 112, 0.18);
+      font-size: clamp(20px, 4vw, 26px);
+      font-weight: 800;
+      letter-spacing: 2px;
+      line-height: 1.1;
+      color: var(--ink);
+      text-shadow: 0 0 14px rgba(247, 238, 223, 0.16);
       white-space: nowrap;
     }
 
-    /* 分隔线与小标题 */
-    .divider {
+    /* 标题下方的虚线与小标题 */
+    .subtitle-divider {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 14px;
-      margin: clamp(20px, 4vw, 34px) auto 0;
-      width: min(420px, 80%);
+      margin: 24px 0 44px;
+      position: relative;
     }
 
-    .divider .line {
+    .subtitle-divider::before, .subtitle-divider::after {
+      content: "";
       flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-deep), transparent);
-      opacity: 0.7;
+      height: 0.5px;
+      background: linear-gradient(to right, transparent, var(--line-light), transparent);
     }
 
-    .divider .dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 10px rgba(224, 192, 112, 0.8);
+    .subtitle-text {
+      font-family: monospace;
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      color: var(--paper);
+      padding: 0 16px;
+      opacity: 0.85;
     }
 
-    .subtitle {
-      margin-top: clamp(16px, 3vw, 24px);
-      font-size: clamp(13px, 2.6vw, 17px);
-      letter-spacing: 0.32em;
-      text-indent: 0.32em;
-      color: var(--gold);
-      opacity: 0.9;
+    /* 核心按钮区：借用文件中的工业档案框风格 */
+    .action-zone {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 46px;
     }
 
-    /* 开始按钮 */
     .start-btn {
-      margin-top: clamp(38px, 7vw, 64px);
-      display: inline-flex;
+      position: relative;
+      background: rgba(209, 199, 183, 0.03);
+      border: 0.5px solid var(--line-heavy);
+      padding: 16px 50px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 15px 52px;
-      font-family: inherit;
-      font-size: clamp(15px, 2.6vw, 18px);
-      letter-spacing: 0.22em;
-      text-indent: 0.22em;
-      color: var(--gold-light);
-      background: transparent;
-      border: 1px solid var(--gold);
-      border-radius: 2px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: color 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
-      box-shadow: 0 0 0 rgba(224, 192, 112, 0);
+      gap: 6px;
     }
 
+    /* 按钮右上角的微缩缺口标签 */
+    .ind-notch {
+      position: absolute;
+      top: -4px;
+      right: 8px;
+      font-size: 5px;
+      font-family: monospace;
+      background: var(--bg);
+      padding: 0 3px;
+      color: rgba(209, 199, 183, 0.45);
+      border: 0.5px solid var(--line-light);
+      line-height: 1;
+    }
+
+    .btn-main-text {
+      font-family: "Georgia", "Songti SC", serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-indent: 3px;
+      color: var(--ink);
+      z-index: 1;
+      transition: color 0.3s ease;
+    }
+
+    .btn-sub-code {
+      font-family: monospace;
+      font-size: 6px;
+      letter-spacing: 1px;
+      color: rgba(209, 199, 183, 0.3);
+      z-index: 1;
+      transition: color 0.3s ease;
+    }
+
+    /* 悬停时的充能与发光 */
     .start-btn::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(120deg, var(--gold-deep), var(--gold), var(--gold-light));
-      transform: translateX(-101%);
-      transition: transform 0.45s ease;
-      z-index: -1;
+      background: rgba(209, 199, 183, 0.05);
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
 
     .start-btn:hover {
-      color: var(--black);
-      border-color: var(--gold-light);
-      box-shadow: 0 0 26px rgba(224, 192, 112, 0.45);
+      border-color: var(--ink);
+      box-shadow: inset 0 0 10px rgba(247, 238, 223, 0.05);
     }
 
     .start-btn:hover::before {
-      transform: translateX(0);
+      opacity: 1;
     }
 
-    .start-btn:active {
-      transform: translateY(1px);
+    .start-btn:hover .btn-main-text {
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
     }
 
-    .start-btn:focus-visible {
-      outline: 2px solid var(--gold-light);
-      outline-offset: 4px;
+    .start-btn:hover .btn-sub-code {
+      color: var(--paper);
     }
 
-    /* 底部装饰文字 */
-    .footer-note {
-      margin-top: clamp(44px, 8vw, 80px);
-      font-size: 11px;
-      letter-spacing: 0.28em;
-      text-indent: 0.28em;
-      color: var(--gold-dim);
-      opacity: 0.75;
+    /* 底部区：极简消散排版 */
+    .terminal-base {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 20px;
     }
 
-    @media (max-width: 420px) {
+    .terminal-base::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--line-light) 50%, transparent);
+    }
+
+    .footer-text {
+      font-family: monospace;
+      font-size: 6.5px;
+      letter-spacing: 0.3em;
+      color: rgba(209, 199, 183, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-text::before, .footer-text::after {
+      content: "◆";
+      font-size: 4px;
+      color: var(--line-heavy);
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 520px) {
+      .archive-matrix {
+        padding: 46px 16px 26px;
+      }
       h1 {
-        white-space: normal;
+        font-size: 18px;
+        letter-spacing: 1px;
+      }
+      .star-icon {
+        width: 16px;
+        height: 16px;
       }
       .start-btn {
-        padding: 14px 34px;
+        padding: 14px 30px;
         width: 100%;
-        max-width: 300px;
       }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .stage, .star { animation: none; }
-      .start-btn, .start-btn::before { transition: none; }
     }
   </style>
 </head>
 <body>
-  <main class="stage">
-    <div class="title-row">
-      <!-- 左侧星星 -->
-      <svg class="star" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill="currentColor" d="M12 1.6l2.9 6.5 7.1.7-5.3 4.8 1.5 7-6.2-3.6-6.2 3.6 1.5-7L2 8.8l7.1-.7L12 1.6z"/>
-      </svg>
-
-      <h1>或许TA是异世界的你？！</h1>
-
-      <!-- 右侧星星 -->
-      <svg class="star" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill="currentColor" d="M12 1.6l2.9 6.5 7.1.7-5.3 4.8 1.5 7-6.2-3.6-6.2 3.6 1.5-7L2 8.8l7.1-.7L12 1.6z"/>
-      </svg>
+  <main class="archive-matrix">
+    
+    <!-- 顶部打字机索引 -->
+    <div class="lead-strip">
+      <span>FOLIO MATRIX // EXTENDED TRAJECTORY</span>
+      <span>VOL. TEARS // [SOAKED]</span>
     </div>
 
-    <div class="divider" aria-hidden="true">
-      <span class="line"></span>
-      <span class="dot"></span>
-      <span class="line"></span>
+    <!-- 标题区 -->
+    <div class="title-container">
+      <div class="title-kicker">Q: WHAT IS YOUR TRUE FORM?</div>
+      <div class="headline-block">
+        <!-- 替换为文件风格的纯细线/灰白闪烁星星 -->
+        <svg class="star-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 1L15 9L23 12L15 15L12 23L9 15L1 12L9 9L12 1Z" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round"/>
+        </svg>
+        
+        <h1>或许TA是异世界的你？！</h1>
+        
+        <svg class="star-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 1L15 9L23 12L15 15L12 23L9 15L1 12L9 9L12 1Z" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round"/>
+        </svg>
+      </div>
     </div>
 
-    <p class="subtitle">· 九域大陆人物小测试 ·</p>
+    <!-- 小标题分隔线 -->
+    <div class="subtitle-divider">
+      <div class="subtitle-text">· 九域大陆人物小测试 ·</div>
+    </div>
 
-    <button id="startBtn" class="start-btn" type="button">开始测试</button>
+    <!-- 开始测试按钮 -->
+    <div class="action-zone">
+      <button id="startBtn" class="start-btn" type="button">
+        <span class="ind-notch">SYS.01</span>
+        <span class="btn-main-text">开始测试</span>
+        <span class="btn-sub-code">INITIATE // SEQUENCE</span>
+      </button>
+    </div>
 
-    <p class="footer-note">九域大陆 · 命运之镜</p>
+    <!-- 底部信息 -->
+    <div class="terminal-base">
+      <div class="footer-text">九域大陆预热小测试</div>
+    </div>
+
   </main>
 
   <script>
     document.getElementById("startBtn").addEventListener("click", () => {
-      // 试题使用子页面，暂未创建，先跳转到占位地址
+      // 跳转到试题子页面
       window.location.href = "quiz.html";
     });
   </script>
