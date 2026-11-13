@@ -41,7 +41,7 @@
         linear-gradient(90deg, var(--line-faint) 1px, transparent 1px);
       background-size: 40px 40px;
       background-position: center top;
-      background-attachment: fixed; /* 框滚动时，背景网格固定，更有空间感 */
+      background-attachment: fixed;
     }
 
     .quiz-wrap {
@@ -50,13 +50,12 @@
       width: min(720px, 100%);
       display: flex;
       flex-direction: column;
-      margin: auto; /* 内容少时垂直居中，内容多时自然撑开 */
+      margin: auto;
       background: rgba(20, 19, 21, 0.88);
       border: 1px solid var(--line-heavy);
       padding: 30px 24px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(10px);
-      /* 移除固定 min-height */
     }
 
     /* 顶部栏 */
@@ -133,7 +132,7 @@
       color: var(--ink);
       margin-bottom: 28px;
       text-shadow: 0 0 1px rgba(247, 238, 223, 0.2);
-      white-space: pre-wrap; /* 保留题目文字里的换行 */
+      white-space: pre-wrap;
     }
 
     /* 选项 */
@@ -865,6 +864,7 @@
         current++;
         render();
       } else {
+        // 最后一题校验
         const firstUnanswered = answers.findIndex((a) => a === null);
         if (firstUnanswered !== -1) {
           alert(`INDEX ERROR // 第 ${firstUnanswered + 1} 题尚未归档，请返回作答。`);
@@ -872,10 +872,23 @@
           render();
           return;
         }
+
+        // 1. 补全所有未点到的属性为 0
+        const finalScores = {
+          智慧: 0, 热情: 0, 不屈: 0, 天真: 0, 
+          忠诚: 0, 正义: 0, 骄傲: 0, 神秘: 0, 谨慎: 0
+        };
+        for (let key in attrScores) {
+          if (finalScores[key] !== undefined) {
+            finalScores[key] = attrScores[key];
+          }
+        }
+
+        // 2. 存入 localStorage
+        localStorage.setItem("quizResult", JSON.stringify(finalScores));
         
-        console.log("最终属性分：", attrScores);
-        alert("已收集全部记录，即将跳转结果页。\n(请在控制台查看属性累计，或在此处接入后续页面)");
-        // window.location.href = "result.html";
+        // 3. 跳转结果页
+        window.location.href = "result.html";
       }
     });
 
