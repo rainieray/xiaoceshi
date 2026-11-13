@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>测试结果 - 九域大陆</title>
+  <style>
+    :root {
+      --paper: #d1c7b7;
+      --ink: #f7eedf;
+      --bg: #141315;
+      --line-heavy: rgba(209, 199, 183, 0.4);
+      --line-light: rgba(209, 199, 183, 0.2);
+      --line-faint: rgba(209, 199, 183, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--paper);
+      font-family: "Georgia", "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      background-image: 
+        linear-gradient(var(--line-faint) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line-faint) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: center top;
+      background-attachment: fixed;
+    }
+
+    .result-wrap {
+      position: relative;
+      z-index: 1;
+      width: min(640px, 100%);
+      display: flex;
+      flex-direction: column;
+      background: rgba(20, 19, 21, 0.88);
+      border: 1px solid var(--line-heavy);
+      padding: 40px 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 顶部提示 */
+    .result-kicker {
+      text-align: center;
+      font-family: monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(209, 199, 183, 0.6);
+      margin-bottom: 10px;
+    }
+
+    /* 角色名大字 */
+    .character-name {
+      text-align: center;
+      font-size: clamp(32px, 6vw, 48px);
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 4px;
+      margin-bottom: 6px;
+      text-shadow: 0 0 20px rgba(247, 238, 223, 0.2);
+    }
+
+    /* 角色称号 */
+    .character-title {
+      text-align: center;
+      font-size: 14px;
+      font-style: italic;
+      color: rgba(209, 199, 183, 0.7);
+      margin-bottom: 40px;
+      letter-spacing: 1px;
+    }
+
+    /* 分隔线 */
+    .divider {
+      width: 100%;
+      height: 0.5px;
+      background: var(--line-light);
+      margin-bottom: 30px;
+      position: relative;
+    }
+    .divider::after {
+      content: '◆';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 6px;
+      color: var(--line-heavy);
+      background: var(--bg);
+      padding: 0 8px;
+    }
+
+    /* 属性条区域 */
+    .stats-area {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stat-label {
+      width: 40px;
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--paper);
+      text-align: right;
+    }
+
+    .stat-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: rgba(209, 199, 183, 0.08);
+      border: 0.5px solid rgba(209, 199, 183, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--paper);
+      box-shadow: 0 0 8px rgba(209, 199, 183, 0.5);
+      transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .stat-value {
+      width: 45px;
+      font-family: monospace;
+      font-size: 10px;
+      color: rgba(209, 199, 183, 0.6);
+      text-align: left;
+    }
+
+    /* 角色介绍文本 */
+    .character-desc {
+      font-size: 14px;
+      line-height: 1.8;
+      color: rgba(209, 199, 183, 0.85);
+      text-align: justify;
+      padding: 20px;
+      border: 0.5px dashed var(--line-light);
+      border-left: 2px solid var(--line-heavy);
+      background: rgba(209, 199, 183, 0.02);
+      margin-bottom: 40px;
+    }
+
+    /* 重新测试按钮 */
+    .restart-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid var(--line-heavy);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .restart-btn:hover {
+      background: rgba(209, 199, 183, 0.08);
+      box-shadow: inset 0 0 15px rgba(209, 199, 183, 0.1);
+    }
+
+    .restart-btn::after {
+      content: 'SYS.RST';
+      position: absolute;
+      top: -5px;
+      right: 10px;
+      font-size: 6px;
+      color: var(--line-heavy);
+      background: var(--bg);
+      padding: 0 4px;
+    }
+
+    @media (max-width: 520px) {
+      .result-wrap {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="result-wrap">
+    <div class="result-kicker">ANALYSIS COMPLETE // 解析完成</div>
+    
+    <!-- 动态填充角色名 -->
+    <div class="character-name" id="charName">加载中...</div>
+    <!-- 动态填充称号 -->
+    <div class="character-title" id="charTitle"></div>
+
+    <div class="divider"></div>
+
+    <!-- 属性条容器 -->
+    <div class="stats-area" id="statsArea">
+      <!-- JS 会在这里生成进度条 -->
+    </div>
+
+    <!-- 动态填充角色介绍 -->
+    <div class="character-desc" id="charDesc"></div>
+
+    <!-- 重新测试按钮 -->
+    <button class="restart-btn" onclick="window.location.href='index.html'">重新建立链接 // RESTART TEST</button>
+  </div>
+
+  <script>
+    // 1. 定义 9 个角色，序号按数组索引 0-8 排列（靠前优先）
+    const ROLES = [
+      { attr: "热情", name: "塔丽莉卡 Talilica", title: "十大赏金猎人之一", desc: "其热情是一种外放而直接的生命力，不刻意收敛，也不故作深沉。待人爽朗坦荡，善意几乎不设门槛，对陌生面孔亦能自然亲近，不因身份高低而改变态度。行动常先于犹豫，遇事敢迎上前，也懂得灵活转身；热情之中并非没有判断，而是以直觉与底线并行，既愿意相信他人，也保有基本分寸。重情重义，厌恶虚伪，遇到不公不平时反应鲜明；对目标抱有持续而明亮的劲头，能把沉闷的场面带出温度，也能在关键时刻成为支撑他人的力量。其热情不喧哗取宠，更像一种坦率、鲜活且富有感染力的存在方式。" },
+      { attr: "谨慎", name: "萨洛米 Salome", title: "神秘的流浪商人", desc: "其谨慎是一种生活化的审慎，并不冷硬。表面随和健谈，善于缓和气氛，实则对人对事先留出观察的距离；不轻易交底，也不轻信承诺。遇压力与冲突，习惯先避锋芒，能退则退，不逞强硬碰；面对陌生关系，先试探再靠近，信任建立得缓慢而克制。言语上可圆融变通，但底线处并不含糊。对所珍视之人存有柔软，却仍习惯把风险想在前面。其谨慎不是多疑，而是一种分寸感与自保本能：既不冒进，也不轻易把自己交出去。" },
+      { attr: "正义", name: "莉瑞尔 Lirael", title: "精灵国度的骑士长", desc: "其正义感并非口号式的宣示，而是一种近乎本能的行动准则。遇事不退缩，习惯第一个站出来，以担当回应危局；认定方向后便果断前行，不轻易被他人左右，也正因如此，固执有时成为其代价。待人坦荡可靠，给人以安心的分量感，表面不拘小节，内里却极有原则；可以灵活应对世事，但在根本信念上从不让步。对承诺与责任看得极重，愿为所信之事付出代价，也能在结果未明之前尽最大努力，成败之后仍保持豁达。其正义不是冷硬的审判，而是一种带着温度与行动的坚守：不空谈，不回避，始终站在自己认为正确的一边。" },
+      { attr: "骄傲", name: "卡洛 Carlo", title: "即将成年的黑暗精灵王子", desc: "其骄傲并非张扬跋扈，而是一种内敛的矜持与自持。不轻易低头，不刻意讨好，也不屑于用谎言粉饰自身；待人先审视后亲近，边界分明，信任难得。情绪稳定得近乎冷淡，外表疏离，言辞偶带锋芒，却并非情绪失控，而是骨子里的标准与底线不容轻慢。遇事习惯隐于幕后，静观其变，关键时刻才出手，且一旦认定方向便不易被他人动摇，宁可一意孤行，也不愿违心妥协。其骄傲中带着责任感：不轻易示弱，不推诿退缩，把守护视为己任，却很少宣之于口。整体而言，是一种不喧哗、不媚俗、宁可被误解也不肯折损自尊的沉静骄傲。" },
+      { attr: "神秘", name: "苏尔 Soul", title: "亡灵的始源", desc: "其神秘并非刻意遮掩，而是一种天然的留白。表面随和健谈，甚至带点漫不经心，能与任何人聊上几句，却极少让人真正触到内里；笑意与应答都在，底牌却始终收着。对人对事看似随意，关键时刻却毫不含糊，判断与行动自有一套逻辑，不解释，也不邀功。情绪不轻易外露，真实意图常隐在轻描淡写之后；不主动刺探，也不轻易交底。友好是礼貌，距离是本能。越靠近，越觉得仍有未读之处；不故弄玄虚，却始终让人猜不透。" },
+      { attr: "忠诚", name: "伊利安 Elian", title: "守护圣物的神官", desc: "其忠诚并非热烈宣示，而是一种近乎沉默的坚守。话不多，情绪也淡，不轻易与人亲近，更不随意许诺；可一旦认定某件事、某个人或某个位置，便不再动摇。表面疏离寡言，常被误读为冷淡难近，实则内心自有一条极清晰的准绳——不解释，不辩白，只以行动落定。对信念与职责看得极重，愿为其付出代价，也能在关键时刻毫不犹豫地站定立场；不因亲疏而偏移，不因利弊而改弦。其忠诚带着一种安静的分量：不喧哗，不表功，不轻易交心，却始终守在自己该在的地方。" },
+      { attr: "天真", name: "埃莉安娜 Aeliana", title: "最后的继承者", desc: "其天真并非无知，而是一种未经磨损的柔软。待人少有防备，愿意先以善意揣度世界，相信沟通能化解多数分歧，也相信大多数相遇本无恶意。心思细腻，能敏锐捕捉他人情绪，却常把问题往自己身上揽，容易内耗，也容易因一句承诺而长久等待。渴望陪伴，害怕被留下，对离别格外敏感；表面温和安静，内里却藏着不愿示人的执拗——若认定要留住什么，也会做出出人意料的举动。其天真带着一种易碎的认真：不设防，不记仇，不擅长伪装，把信任交出去时几乎不留退路，也因此格外需要被温柔以待。" },
+      { attr: "不屈", name: "法格里姆 Fargrim", title: "追逐天赋的工匠", desc: "其不屈并非张扬的对抗，而是一种从泥泞里长出来的韧性。外表看似温顺乖巧，实则内里带刺，不轻易认命，也不轻易低头。经历过冷眼与匮乏，却未被磨去骨气，反而养成一种“越不被看好越要往前”的倔强。行事懂得迂回，不硬碰硬，可退可绕，但方向始终向前；不轻信他人，也不轻易交底，却在暗处默默积攒、反复尝试，哪怕一次次失败也不肯罢手。对认定的事有一种近乎执拗的坚持，不声张，不诉苦，只闷头去做。其不屈带着一点孤勇：不指望被理解，也不等谁来救，靠自己的方式一寸一寸挣出想要的结果。" },
+      { attr: "智慧", name: "瑞伊 Ray", title: "肩负命运之人", desc: "其智慧并不锋芒外露，而是一种内敛而稳定的清醒。面对复杂情境，先稳住情绪，再理清脉络；判断时不轻信表象，也不盲从权威，善于在细节与全局之间寻找平衡。待人保有礼貌与边界，既不过分亲近，也不令人难堪；遇事有分寸，知进退，懂取舍。对未知保持好奇与敬畏，对自身局限有自觉，不炫耀聪明，也不逃避责任。目标清晰，行动审慎，能在理性与灵活之间调整步伐。其智慧更像一种沉静的判断力：不急着证明自己，却能在关键时刻做出清醒选择。" }
+    ];
+
+    // 2. 读取 quiz.html 存入的数据
+    const savedData = localStorage.getItem("quizResult");
+    let scores = {};
+
+    if (savedData) {
+      scores = JSON.parse(savedData);
+    } else {
+      // 如果直接访问，或者数据丢失，默认全 0
+      scores = { 智慧: 0, 热情: 0, 不屈: 0, 天真: 0, 忠诚: 0, 正义: 0, 骄傲: 0, 神秘: 0, 谨慎: 0 };
+    }
+
+    // 3. 数据处理：转为数组并排序
+    const statsArray = Object.keys(scores).map(key => ({
+      attr: key,
+      score: scores[key]
+    }));
+
+    // 找出最高分
+    let maxScore = -1;
+    statsArray.forEach(item => {
+      if (item.score > maxScore) {
+        maxScore = item.score;
+      }
+    });
+
+    // 根据分数从高到低排序（用于展示进度条）
+    statsArray.sort((a, b) => b.score - a.score);
+
+    // 4. 匹配角色：按 ROLES 的顺序（靠前优先）寻找对应最高分的属性
+    let matchedRole = ROLES[0]; // 默认第一个
+    for (let i = 0; i < ROLES.length; i++) {
+      // 找到 ROLES 中对应的属性，看其是否等于最高分
+      if (scores[ROLES[i].attr] === maxScore) {
+        matchedRole = ROLES[i];
+        break; // 一旦找到靠前的就跳出循环（实现了平局优先靠前）
+      }
+    }
+
+    // 5. 渲染角色信息
+    document.getElementById("charName").textContent = matchedRole.name;
+    document.getElementById("charTitle").textContent = `— ${matchedRole.title} —`;
+    document.getElementById("charDesc").textContent = matchedRole.desc;
+
+    // 6. 渲染进度条
+    const statsArea = document.getElementById("statsArea");
+    const MAX_DISPLAY = 100; // 进度条按 100 为满值显示
+
+    statsArray.forEach((item, index) => {
+      // 计算进度条宽度百分比，封顶 100%
+      const percent = Math.min((item.score / MAX_DISPLAY) * 100, 100);
+      
+      const row = document.createElement("div");
+      row.className = "stat-row";
+      
+      row.innerHTML = `
+        <div class="stat-label">${item.attr}</div>
+        <div class="stat-bar-bg">
+          <div class="stat-bar-fill" style="width: 0%"></div>
+        </div>
+        <div class="stat-value">${item.score} / 100</div>
+      `;
+      
+      statsArea.appendChild(row);
+
+      // 延迟一点点执行动画，让进度条有一个渐进的生长效果
+      setTimeout(() => {
+        row.querySelector(".stat-bar-fill").style.width = percent + "%";
+      }, 100 + index * 80);
+    });
+  </script>
+</body>
+</html>
