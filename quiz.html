@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>九域大陆人物小测试</title>
+  <style>
+    /* 提取自中世纪档案排版文件色系与字体 */
+    :root {
+      --paper: #d1c7b7;
+      --ink: #f7eedf;
+      --bg: #141315;
+      --line-heavy: rgba(209, 199, 183, 0.4);
+      --line-light: rgba(209, 199, 183, 0.2);
+      --line-faint: rgba(209, 199, 183, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--paper);
+      font-family: "Georgia", "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      position: relative;
+      /* 模拟档案排版网格背景 */
+      background-image: 
+        linear-gradient(var(--line-faint) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line-faint) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: center top;
+      background-attachment: fixed; /* 框滚动时，背景网格固定，更有空间感 */
+    }
+
+    .quiz-wrap {
+      position: relative;
+      z-index: 1;
+      width: min(720px, 100%);
+      display: flex;
+      flex-direction: column;
+      margin: auto; /* 内容少时垂直居中，内容多时自然撑开 */
+      background: rgba(20, 19, 21, 0.88);
+      border: 1px solid var(--line-heavy);
+      padding: 30px 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      /* 移除固定 min-height */
+    }
+
+    /* 顶部栏 */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 0.5px solid var(--line-light);
+      padding-bottom: 12px;
+    }
+
+    .back-link {
+      font-family: monospace;
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      color: rgba(209, 199, 183, 0.45);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 0;
+      transition: color 0.25s ease;
+    }
+
+    .back-link:hover {
+      color: var(--ink);
+    }
+
+    .counter {
+      font-family: monospace;
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      color: rgba(209, 199, 183, 0.45);
+    }
+
+    .counter strong {
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 700;
+      margin: 0 2px;
+    }
+
+    /* 题目区 */
+    .question-area {
+      flex: 1;
+    }
+
+    .q-index {
+      font-family: monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(209, 199, 183, 0.4);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .q-index::before {
+      content: 'INDEX //';
+      font-size: 7px;
+    }
+
+    .q-index .num {
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .q-text {
+      font-size: clamp(16px, 2.8vw, 20px);
+      line-height: 1.6;
+      color: var(--ink);
+      margin-bottom: 28px;
+      text-shadow: 0 0 1px rgba(247, 238, 223, 0.2);
+      white-space: pre-wrap; /* 保留题目文字里的换行 */
+    }
+
+    /* 选项 */
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      width: 100%;
+      text-align: left;
+      padding: 12px 16px;
+      font-family: inherit;
+      font-size: clamp(13px, 2.2vw, 15px);
+      line-height: 1.5;
+      color: rgba(209, 199, 183, 0.8);
+      background: rgba(209, 199, 183, 0.02);
+      border: 0.5px solid var(--line-light);
+      cursor: pointer;
+      transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+    }
+
+    .option .mark {
+      flex: 0 0 auto;
+      margin-top: 2px;
+      font-family: monospace;
+      font-size: 8px;
+      color: rgba(209, 199, 183, 0.5);
+      border: 0.5px solid var(--line-light);
+      padding: 2px 5px;
+      transition: all 0.25s ease;
+    }
+
+    .option:hover {
+      background: rgba(209, 199, 183, 0.06);
+      border-color: rgba(209, 199, 183, 0.45);
+      transform: translateX(3px);
+    }
+
+    .option.selected {
+      background: rgba(209, 199, 183, 0.1);
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    .option.selected .mark {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    /* 导航按钮 */
+    .nav-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 12px 16px;
+      color: var(--paper);
+      background: transparent;
+      border: 0.5px solid var(--line-light);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: var(--line-heavy);
+      color: var(--ink);
+      background: rgba(209, 199, 183, 0.04);
+      box-shadow: inset 0 0 10px rgba(209, 199, 183, 0.05);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .nav-btn::after {
+      content: 'SYS';
+      position: absolute;
+      top: -4px;
+      right: 6px;
+      font-family: monospace;
+      font-size: 5px;
+      color: rgba(209, 199, 183, 0.3);
+      background: var(--bg);
+      padding: 0 2px;
+      border: 0.5px solid var(--line-light);
+      line-height: 1;
+    }
+
+    /* 底部进度条 */
+    .progress-zone {
+      margin-top: 30px;
+      border-top: 1px dashed var(--line-light);
+      padding-top: 16px;
+    }
+
+    .progress-track {
+      height: 2px;
+      background: rgba(209, 199, 183, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--ink);
+      box-shadow: 0 0 6px rgba(247, 238, 223, 0.4);
+      transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 8px;
+      font-family: monospace;
+      letter-spacing: 1px;
+      color: rgba(209, 199, 183, 0.4);
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 20px 14px 30px;
+      }
+      .quiz-wrap {
+        padding: 20px 16px;
+      }
+      .nav-row {
+        margin-top: 24px;
+      }
+      .nav-btn {
+        padding: 10px 8px;
+        letter-spacing: 1px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-wrap" id="quizWrap">
+    <header class="top-bar">
+      <button class="back-link" id="backHome" type="button">← RETURN TO COVER</button>
+      <div class="counter">FILE <strong id="currentNum">1</strong> / 45</div>
+    </header>
+
+    <main class="question-area">
+      <div class="q-index"><span class="num" id="qIndex">01</span></div>
+      <h2 class="q-text" id="qText">加载中...</h2>
+      <div class="options" id="options"></div>
+    </main>
+
+    <div class="nav-row">
+      <button class="nav-btn" id="prevBtn" type="button">PREV // 上一题</button>
+      <button class="nav-btn" id="nextBtn" type="button">NEXT // 下一题</button>
+    </div>
+
+    <footer class="progress-zone">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-label">
+        <span>RECORD PROGRESS</span>
+        <span id="progressText">00 / 45</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      {
+        text: "I：某天你从睡梦中醒来，发现你自己穿越进了友人写的小说里，她给你留了一张便条：宝子玩得快乐！你的第一反应是？",
+        options: [
+          { text: "这谁给我报的名？", scores: { 谨慎: 2 } },
+          { text: "呵，有趣的女人。", scores: { 神秘: 2 } },
+          { text: "噢噢噢冲冲冲", scores: { 热情: 2 } },
+          { text: "这福气给你要不要？", scores: { 不屈: 2 } },
+          { text: "我记得她写的好像是……", scores: { 智慧: 2 } },
+          { text: "啥意思？算了来都来了", scores: { 天真: 2 } },
+          { text: "你这不是拐卖人口吗？", scores: { 正义: 2 } },
+          { text: "既然是她写的那肯定要好好体验。", scores: { 忠诚: 2 } },
+          { text: "写的什么东西也配让我亲自体验？", scores: { 骄傲: 2 } }
+        ]
+      },
+      {
+        text: "II：白光一现，你发现你身处于？",
+        options: [
+          { text: "繁华热闹的城镇", scores: { 智慧: 2, 热情: 2, 不屈: 2 } },
+          { text: "安静森冷的宫殿", scores: { 天真: 2, 忠诚: 2, 正义: 2, 骄傲: 2 } },
+          { text: "鱼龙混杂的市集", scores: { 神秘: 2, 谨慎: 2 } }
+        ]
+      },
+      {
+        text: "III：你检查了以下身上的物品，发现除了一点金币，友人还给你留了？",
+        options: [
+          { text: "一柄锋利的匕首", scores: { 热情: 2 } },
+          { text: "一本《九域大陆企划食用指南》", scores: { 智慧: 2 } },
+          { text: "一枚徽章", scores: { 骄傲: 2 } },
+          { text: "一条精美的首饰", scores: { 忠诚: 2 } },
+          { text: "一把由木头制成的弓", scores: { 正义: 2 } },
+          { text: "一根棍子", scores: { 天真: 2 } },
+          { text: "一把螺丝刀", scores: { 不屈: 2 } },
+          { text: "很多看起来是废品的不知名物品", scores: { 谨慎: 2 } },
+          { text: "一把尤克里里", scores: { 神秘: 2 } }
+        ]
+      },
+      {
+        text: "IV：你收拾好东西离开这里。不知走了多久，你终于找到了一家酒馆。进入酒馆，你打算？",
+        options: [
+          { text: "沉默地找个角落，观察四周", scores: { 神秘: 2, 谨慎: 2 } },
+          { text: "找座位坐下，研究手中的物品", scores: { 骄傲: 2, 智慧: 2 } },
+          { text: "找个看起来友善的人问问", scores: { 热情: 2 } },
+          { text: "你饿坏了，先吃一顿", scores: { 天真: 2, 不屈: 2 } },
+          { text: "看看酒馆里的报纸或是记事板", scores: { 忠诚: 2, 正义: 2 } }
+        ]
+      },
+      {
+        text: "V：这时，一个人鬼鬼祟祟地走近你，询问你需不需要情报，你的反应是？",
+        options: [
+          { text: "天下没有免费的午餐，你要什么？", scores: { 智慧: 2, 神秘: 2 } },
+          { text: "先与他周旋一番，探探他的底细", scores: { 谨慎: 2, 不屈: 2, 热情: 2 } },
+          { text: "给他一枚银币，让他自己看着说", scores: { 忠诚: 2, 正义: 2 } },
+          { text: "不搭理他", scores: { 骄傲: 2, 天真: 2 } }
+        ]
+      },
+      {
+        text: "VI：情报贩子并没有给出什么有用的信息。\n你们的交谈声吸引了一个人的注意，她上前一步，将你从这场对话里解救出来。把那个情报贩子打发走后，她仔细地端详着你的脸，半天来了一句：【你和我认识的一个人好像！】\n你对女孩的印象是？",
+        options: [
+          { text: "一个看起来很普通、没什么特点的人", scores: { 谨慎: 2, 不屈: 2, 骄傲: 2 } },
+          { text: "一个看起来很有书卷气的人", scores: { 忠诚: 2, 正义: 2 } },
+          { text: "一个明明在笑着，眼神有些冷淡的人", scores: { 神秘: 2, 热情: 2 } },
+          { text: "一个拥有清澈双眼的人", scores: { 智慧: 2, 天真: 2 } }
+        ]
+      },
+      {
+        text: "VII：你和女孩寒暄了一会，她邀请你明天一起吃早餐。告别女孩后你回到房间，你的友人和你在梦中相聚。你向她询问回到现实世界的方法，她反而询问你希望来一场怎样的旅行，你的回答是？",
+        options: [
+          { text: "我希望能看到更多有关于这个世界的故事", scores: { 智慧: 2, 神秘: 2 } },
+          { text: "我希望来一场惊心动魄的冒险", scores: { 不屈: 2, 热情: 2 } },
+          { text: "我希望能从中探索出属于我的答案", scores: { 谨慎: 2, 正义: 2 } },
+          { text: "我希望是一次全身心放松的旅行", scores: { 骄傲: 2 } },
+          { text: "我希望这场旅行是和我的朋友们一起进行的", scores: { 忠诚: 2, 天真: 2 } }
+        ]
+      },
+      {
+        text: "VIII：【达成目标就能离开噢！】友人这样说着就离开了。早餐时间，女孩希望能与你一同冒险，你犹豫着同意了。第一站你们即将前往金穗之谷，根据你的了解，你觉得这是一个？",
+        options: [
+          { text: "满是金黄稻谷的富饶之地", scores: { 智慧: 2, 忠诚: 2, 正义: 2 } },
+          { text: "诞生勇者与冒险的新手村", scores: { 热情: 2, 谨慎: 2 } },
+          { text: "坐落在极深峡谷里的小镇", scores: { 不屈: 2, 天真: 2 } },
+          { text: "一切故事都要从这里说起", scores: { 骄傲: 2, 神秘: 2 } }
+        ]
+      },
+      {
+        text: "IX：秉承着来都来了的想法，你打算登记成为一名冒险者。你对着训练用的假人使出全力一击，公会给你的评级为？",
+        options: [
+          { text: "A级【资深冒险者】", scores: { 热情: 2, 天真: 2, 神秘: 2 } },
+          { text: "B级【职业冒险者】", scores: { 不屈: 2, 忠诚: 2, 正义: 2 } },
+          { text: "C级【见习冒险者】", scores: { 骄傲: 2 } },
+          { text: "D级【学徒冒险者】", scores: { 谨慎: 2 } },
+          { text: "哇你对稻草人的伤害高达惊人的0", scores: { 智慧: 2 } }
+        ]
+      },
+      {
+        text: "X：你们来到当地的一家有名的酒馆，女孩热情的给你介绍美食。你从身边的架子上拿过本册子，上面介绍了十大赏金猎人，看见位于榜首的女孩，你认为？",
+        options: [
+          { text: "她一定是个努力的人", scores: { 智慧: 2, 热情: 2, 天真: 2, 谨慎: 2 } },
+          { text: "她一定是个强大的人", scores: { 骄傲: 2, 不屈: 2 } },
+          { text: "她一定有属于自己的目标", scores: { 忠诚: 2, 正义: 2, 神秘: 2 } }
+        ]
+      },
+      {
+        text: "XI：路过小贩，你想起友人说过的可以带些纪念品，你想要？",
+        options: [
+          { text: "一圈小小的花环", scores: { 谨慎: 2, 天真: 2 } },
+          { text: "一枚冒险者公会的徽章", scores: { 智慧: 2, 骄傲: 2 } },
+          { text: "一瓶装着不明液体的药剂", scores: { 神秘: 2, 不屈: 2 } },
+          { text: "一条红色的丝带", scores: { 热情: 2, 正义: 2 } },
+          { text: "一朵蓝色的花", scores: { 骄傲: 2, 忠诚: 2 } }
+        ]
+      },
+      {
+        text: "XII：下一站即将前往风息草原，根据你的了解，这是一个？",
+        options: [
+          { text: "风在空中穿梭的草原", scores: { 热情: 2, 不屈: 2, 骄傲: 2 } },
+          { text: "心中无法浇灭的篝火", scores: { 忠诚: 2, 正义: 2 } },
+          { text: "神秘祭祀的始源之地", scores: { 智慧: 2, 神秘: 2 } },
+          { text: "令人心碎的兽族故乡", scores: { 天真: 2, 谨慎: 2 } }
+        ]
+      },
+      {
+        text: "XIII：草原辽阔，你站在其中感受风的流动。忽然，一个兽人女孩在玩闹的过程中撞到了你，你惊讶地看着她，最先注意到的是：",
+        options: [
+          { text: "如火一般的头发", scores: { 热情: 2, 天真: 2 } },
+          { text: "如蛇一般的双眸", scores: { 智慧: 2, 神秘: 2 } },
+          { text: "坚毅的眼神", scores: { 骄傲: 2, 忠诚: 2, 正义: 2 } },
+          { text: "丰富的编绳", scores: { 谨慎: 2, 不屈: 2 } }
+        ]
+      },
+      {
+        text: "XIV：红发少女的哥哥无奈地呼唤着女孩的名字，看见你的同伴，他微微一愣，邀请你前往他们家里玩。但是你刚刚知道兽族部落不对外开放的规矩，你认为？",
+        options: [
+          { text: "不能坏了当地的规矩", scores: { 天真: 2 } },
+          { text: "遵守规矩nonono，不走寻常gogogo", scores: { 热情: 2 } },
+          { text: "啊？我知道吗？我不知道。", scores: { 智慧: 2 } },
+          { text: "还是算了吧，要遵守规则", scores: { 忠诚: 2 } },
+          { text: "你家里几个人敢拦我", scores: { 骄傲: 2 } },
+          { text: "设定这个规则，一定有他自己的道理。", scores: { 正义: 2 } },
+          { text: "对于这个地方完全不感兴趣。", scores: { 谨慎: 2 } },
+          { text: "不对外开放？有什么秘密？", scores: { 神秘: 2 } },
+          { text: "比起走正门，我有更好的选择", scores: { 不屈: 2 } }
+        ]
+      },
+      {
+        text: "XV：临走前，你能带走一个纪念品，你选择？",
+        options: [
+          { text: "一面具有民族特色的鼓", scores: { 热情: 2, 天真: 2 } },
+          { text: "一枚普通的纪念币", scores: { 智慧: 2 } },
+          { text: "一本流传于风中的诗集", scores: { 骄傲: 2, 正义: 2 } },
+          { text: "一条精美的手编绳", scores: { 忠诚: 2, 不屈: 2 } },
+          { text: "一个祭祀用的面具", scores: { 谨慎: 2, 神秘: 2 } }
+        ]
+      },
+      {
+        text: "XVI：下一站即将前往光黯森林，根据你的了解，这是一个？",
+        options: [
+          { text: "精灵世代栖息的家园", scores: { 正义: 2, 热情: 2, 忠诚: 2 } },
+          { text: "战争不断的禁忌之地", scores: { 不屈: 2, 智慧: 2 } },
+          { text: "静谧而神秘的古森林", scores: { 神秘: 2, 天真: 2 } },
+          { text: "一脉相承的爱恨情仇", scores: { 谨慎: 2, 骄傲: 2 } }
+        ]
+      },
+      {
+        text: "XVII：你们来到精灵王庭觐见女王，女王看起来面色不太好，你觉得是因为？",
+        options: [
+          { text: "她对我有意见？", scores: { 智慧: 2 } },
+          { text: "谁又惹她了？", scores: { 谨慎: 2, 不屈: 2 } },
+          { text: "没休息好吧", scores: { 正义: 2, 热情: 2 } },
+          { text: "她身体不太好应该", scores: { 忠诚: 2, 天真: 2 } },
+          { text: "并不是很关心原因", scores: { 神秘: 2, 骄傲: 2 } }
+        ]
+      },
+      {
+        text: "XVIII：路过回廊，你看见两个精灵对坐着下棋。其中一人身穿盔甲，应该是精灵的骑士长；另一人身着长袍，应该是祭司或是牧师。你看了一会觉得？",
+        options: [
+          { text: "骑士长会赢", scores: { 热情: 2, 正义: 2, 忠诚: 2 } },
+          { text: "牧师会赢", scores: { 神秘: 2, 谨慎: 2, 天真: 2 } },
+          { text: "两个都是菜鸡，我觉得我来我能赢", scores: { 智慧: 2, 不屈: 2, 骄傲: 2 } }
+        ]
+      },
+      {
+        text: "XIX：黑暗精灵王为了表达地主之谊，送来一杯酒水，你认为？",
+        options: [
+          { text: "他毕竟是黑暗精灵，应该不怀好心", scores: { 忠诚: 2, 正义: 2, 谨慎: 2, 不屈: 2 } },
+          { text: "喝就喝，他还能对我做些什么不成", scores: { 智慧: 2, 热情: 2, 天真: 2, 骄傲: 2, 神秘: 2 } }
+        ]
+      },
+      {
+        text: "XX：下一站即将前往巫师山脉，根据你的了解，这是一个？",
+        options: [
+          { text: "疯狂的瓦尔普吉斯之夜", scores: { 智慧: 2, 热情: 2 } },
+          { text: "神秘的巫师聚集地", scores: { 正义: 2, 骄傲: 2 } },
+          { text: "藏匿着不为人知的秘密", scores: { 不屈: 2, 神秘: 2, 谨慎: 2 } },
+          { text: "高塔重重地连绵山脉", scores: { 天真: 2, 忠诚: 2 } }
+        ]
+      },
+      {
+        text: "XXI：巫师山脉的路口站着一个音乐家，她缠着你的同伴，你只好先行离开。没过多久，你发现你闯入了一场换装盛典，你打算装扮成？",
+        options: [
+          { text: "一位贫穷的贵族", scores: { 智慧: 2, 天真: 2, 骄傲: 2 } },
+          { text: "一位懦弱的勇者", scores: { 热情: 2, 正义: 2 } },
+          { text: "一位慷慨的商人", scores: { 不屈: 2, 谨慎: 2 } },
+          { text: "一位背叛的忠臣", scores: { 忠诚: 2, 神秘: 2 } }
+        ]
+      },
+      {
+        text: "XXII：舞会疯狂地进行着，你发现你好像慢慢忘记了什么事情，是什么事情呢？",
+        options: [
+          { text: "真实的自我", scores: { 智慧: 2, 忠诚: 2 } },
+          { text: "初始的故乡", scores: { 热情: 2, 骄傲: 2 } },
+          { text: "努力的目标", scores: { 不屈: 2, 正义: 2, 神秘: 2 } },
+          { text: "平凡的日常", scores: { 天真: 2, 谨慎: 2 } }
+        ]
+      },
+      {
+        text: "XXIII：唯独这些事绝对不能忘记，是什么把你从这场闹剧中唤醒？",
+        options: [
+          { text: "有纪念意义的饰品", scores: { 热情: 2, 骄傲: 2, 谨慎: 2 } },
+          { text: "脑海中抓住的理念", scores: { 不屈: 2, 正义: 2, 神秘: 2 } },
+          { text: "同伴呼唤的声音", scores: { 智慧: 2, 天真: 2, 忠诚: 2 } }
+        ]
+      },
+      {
+        text: "XXIV：下一站即将前往沃卡诺雪山，根据你的了解，这是一个？",
+        options: [
+          { text: "一常年冰雪覆盖的高山", scores: { 不屈: 2, 天真: 2 } },
+          { text: "时隐时现的冰雪之城", scores: { 正义: 2, 骄傲: 2 } },
+          { text: "被封印的古老传说", scores: { 忠诚: 2, 谨慎: 2 } },
+          { text: "那段被埋葬的历史", scores: { 智慧: 2, 热情: 2, 神秘: 2 } }
+        ]
+      },
+      {
+        text: "XXV：你跟随着众人进入雪山，一位神官将你们领进宫殿。那位神官若有所思地看着你，可当你询问后，他却只是摇摇头不回答。你觉得？",
+        options: [
+          { text: "他是不是有话想对我说", scores: { 智慧: 2, 热情: 2, 天真: 2 } },
+          { text: "真是个莫名其妙的人", scores: { 忠诚: 2, 正义: 2, 神秘: 2 } },
+          { text: "没事找事", scores: { 不屈: 2, 骄傲: 2, 谨慎: 2 } }
+        ]
+      },
+      {
+        text: "XXVI：大家体验了一场活动，奇怪的是你的同伴并不允许参加。此时有几张身份牌摊开在你眼前，你希望你抽到？",
+        options: [
+          { text: "懦弱的领袖", scores: { 热情: 2 } },
+          { text: "被蒙蔽的骑士", scores: { 智慧: 2 } },
+          { text: "迷途知返的叛徒", scores: { 神秘: 2 } },
+          { text: "摇摆的臣民", scores: { 谨慎: 2, 正义: 2, 天真: 2, 不屈: 2 } },
+          { text: "隔岸观火的帝王", scores: { 骄傲: 2 } },
+          { text: "拥有自我意识的木偶", scores: { 忠诚: 2 } }
+        ]
+      },
+      {
+        text: "XXVII：一天结束了，你可以带走一个纪念品，你想要？",
+        options: [
+          { text: "一盏小灯", scores: { 忠诚: 2, 谨慎: 2, 热情: 2 } },
+          { text: "一片雪花", scores: { 骄傲: 2, 天真: 2, 不屈: 2 } },
+          { text: "一篇故事", scores: { 智慧: 2, 正义: 2, 神秘: 2 } }
+        ]
+      },
+      {
+        text: "XXVIII：下一站即将前往环岸群岛，根据你的了解，这是一个？",
+        options: [
+          { text: "群岛环绕的汪洋大海", scores: { 智慧: 2, 不屈: 2 } },
+          { text: "以人鱼为信仰的海城", scores: { 天真: 2 } },
+          { text: "海上可怖的诡谲传说", scores: { 忠诚: 2, 骄傲: 2, 正义: 2 } },
+          { text: "神秘浪漫的海上冒险", scores: { 热情: 2, 谨慎: 2, 神秘: 2 } }
+        ]
+      },
+      {
+        text: "XXIX：人鱼港是一座以人鱼为信仰的海城，在你的心目中，人鱼的形象是？",
+        options: [
+          { text: "海中游曳的美丽身姿", scores: { 正义: 2, 热情: 2 } },
+          { text: "极高经济价值的货物", scores: { 不屈: 2, 骄傲: 2, 神秘: 2 } },
+          { text: "与人无异的生物种群", scores: { 天真: 2, 忠诚: 2 } },
+          { text: "哪怕真的存在，也宁可不存在之物", scores: { 智慧: 2, 谨慎: 2 } }
+        ]
+      },
+      {
+        text: "XXX：同伴一来到海城就不见了踪影。无奈之下你只好自己游玩，途中意外解释了一位少女，她希望和你约定好明天也要一起玩。她神情认真，你认为？",
+        options: [
+          { text: "同意她的约定", scores: { 忠诚: 2, 天真: 2, 热情: 2 } },
+          { text: "明确拒绝她", scores: { 骄傲: 2, 正义: 2, 不屈: 2 } },
+          { text: "左右而言他", scores: { 神秘: 2, 智慧: 2, 谨慎: 2 } }
+        ]
+      },
+      {
+        text: "XXXI：临走前，你可以带走一个奖品，你想要？",
+        options: [
+          { text: "一枚珍珠", scores: { 不屈: 2, 天真: 2, 忠诚: 2 } },
+          { text: "一张邀请函", scores: { 热情: 2, 正义: 2 } },
+          { text: "一根蓝丝带", scores: { 骄傲: 2, 神秘: 2 } },
+          { text: "什么都不要", scores: { 智慧: 2, 谨慎: 2 } }
+        ]
+      },
+      {
+        text: "XXXII：下一站即将前往蒸汽群山，根据你的了解，这是一个？",
+        options: [
+          { text: "有【小广西】之名的群山", scores: { 热情: 2, 谨慎: 2 } },
+          { text: "被摧毁的蒸汽之城", scores: { 骄傲: 2, 正义: 2 } },
+          { text: "迷宫般的城市建筑", scores: { 忠诚: 2, 天真: 2 } },
+          { text: "真实的自我映于其中", scores: { 智慧: 2, 不屈: 2, 神秘: 2 } }
+        ]
+      },
+      {
+        text: "XXXIII：机械之城地势错综复杂，你不慎和同伴走散了，这时你注意到墙上写着街区号【有三个相互咬合的齿轮。一号齿轮转动两圈的时候，二号齿轮刚好转动四圈；二号齿轮转动五圈的时候，三号齿轮正好转动两圈】，你觉得？",
+        options: [
+          { text: "我知道了，这里是2街5巷4号", scores: { 热情: 2, 谨慎: 2, 骄傲: 2 } },
+          { text: "我知道了，这里是4街2巷5号", scores: { 智慧: 2, 神秘: 2, 不屈: 2 } },
+          { text: "算了，我等她来找我吧", scores: { 天真: 2, 正义: 2, 忠诚: 2 } }
+        ]
+      },
+      {
+        text: "XXXIV：好不容易与同伴汇合，她的身边跟着一个清秀的少年，他给你带了见面礼。你打开后，发现是？",
+        options: [
+          { text: "一枚镶着水晶的戒指", scores: { 智慧: 2, 天真: 2 } },
+          { text: "一把精心打造的匕首", scores: { 正义: 2, 忠诚: 2, 热情: 2 } },
+          { text: "一根略有粗糙的魔杖", scores: { 骄傲: 2, 神秘: 2 } },
+          { text: "你随身携带的物品", scores: { 不屈: 2, 谨慎: 2 } }
+        ]
+      },
+      {
+        text: "XXXV：同伴带你来到一面镜子前，一个神秘的声音响起：【你最想知道什么问题的答案】？",
+        options: [
+          { text: "我曾经最好奇的问题的答案", scores: { 热情: 2 } },
+          { text: "我该如何回到现实世界", scores: { 天真: 2, 谨慎: 2 } },
+          { text: "别人是如何看待我的", scores: { 不屈: 2, 正义: 2, 骄傲: 2 } },
+          { text: "我该如何达成我的目标", scores: { 神秘: 2, 忠诚: 2, 智慧: 2 } }
+        ]
+      },
+      {
+        text: "XXXVI：下一站即将前往热浪沙漠，根据你的了解，这是一个？",
+        options: [
+          { text: "坐落在沙漠里的美食之城", scores: { 热情: 2, 天真: 2 } },
+          { text: "不和谐的神秘之门", scores: { 忠诚: 2, 正义: 2 } },
+          { text: "藏匿于此的人们早已被遗忘", scores: { 谨慎: 2, 神秘: 2, 骄傲: 2 } },
+          { text: "寂寥无人，黄沙漫天", scores: { 智慧: 2, 不屈: 2 } }
+        ]
+      },
+      {
+        text: "XXXVII：耍起！美食之城畅快玩！ 你打算去？",
+        options: [
+          { text: "鬼屋", scores: { 天真: 2, 骄傲: 2, 神秘: 2 } },
+          { text: "摩天轮", scores: { 不屈: 2, 忠诚: 2, 正义: 2 } },
+          { text: "商场", scores: { 智慧: 2, 热情: 2, 谨慎: 2 } }
+        ]
+      },
+      {
+        text: "XXXVIII：游戏的途中，会有很多二选一的时刻，你是决定跟随自己的内心，还是听从同伴的判断？",
+        options: [
+          { text: "跟随自己的内心", scores: { 智慧: 2, 热情: 2, 不屈: 2, 骄傲: 2 } },
+          { text: "听从同伴的判断", scores: { 天真: 2, 忠诚: 2, 正义: 2, 神秘: 2, 谨慎: 2 } }
+        ]
+      },
+      {
+        text: "XXXIX：游戏结束，恭喜你获得了奖励，你最喜欢？",
+        options: [
+          { text: "一柄旧剑", scores: { 热情: 2, 正义: 2, 谨慎: 2 } },
+          { text: "一段往事", scores: { 不屈: 2, 天真: 2, 忠诚: 2 } },
+          { text: "一个乐器", scores: { 智慧: 2, 骄傲: 2, 神秘: 2 } }
+        ]
+      },
+      {
+        text: "XL：你认为这一路上最重要的是什么？",
+        options: [
+          { text: "朋友", scores: { 智慧: 3, 天真: 3 } },
+          { text: "日常", scores: { 神秘: 3, 谨慎: 3 } },
+          { text: "冒险", scores: { 正义: 3, 热情: 3 } },
+          { text: "结局", scores: { 不屈: 3, 忠诚: 3, 骄傲: 3 } }
+        ]
+      },
+      {
+        text: "XLI：回忆出可能会让你印象深刻的场景？",
+        options: [
+          { text: "草原", scores: { 谨慎: 3 } },
+          { text: "山脉", scores: { 神秘: 3 } },
+          { text: "雪山", scores: { 忠诚: 3 } },
+          { text: "海洋", scores: { 天真: 3 } },
+          { text: "峡谷", scores: { 热情: 3 } },
+          { text: "丘陵", scores: { 不屈: 3 } },
+          { text: "森林", scores: { 正义: 3 } },
+          { text: "沙漠", scores: { 骄傲: 3 } },
+          { text: "城市", scores: { 智慧: 3 } }
+        ]
+      },
+      {
+        text: "XLII：对于这个故事，你会做出怎样的评价？",
+        options: [
+          { text: "一个振奋人心的故事", scores: { 热情: 3, 谨慎: 3 } },
+          { text: "一次新奇古怪的体验", scores: { 天真: 3, 骄傲: 3, 神秘: 3 } },
+          { text: "一个肩负重任的旅程", scores: { 忠诚: 3, 不屈: 3, 智慧: 3, 正义: 3 } }
+        ]
+      },
+      {
+        text: "XLIII：你认为这场奇妙的旅程最不可或缺的性格是？",
+        options: [
+          { text: "博学", scores: { 神秘: 3 } },
+          { text: "忠实", scores: { 忠诚: 3 } },
+          { text: "热情", scores: { 热情: 3 } },
+          { text: "谨慎", scores: { 谨慎: 3 } },
+          { text: "纯真", scores: { 天真: 3 } },
+          { text: "正义", scores: { 正义: 3 } },
+          { text: "反抗", scores: { 骄傲: 3 } },
+          { text: "坚毅", scores: { 不屈: 3 } },
+          { text: "领导", scores: { 智慧: 3 } }
+        ]
+      },
+      {
+        text: "XLIV：你觉得对于你来说，最重要的是什么？",
+        options: [
+          { text: "自由", scores: { 智慧: 3 } },
+          { text: "安全", scores: { 谨慎: 3 } },
+          { text: "意义", scores: { 神秘: 3 } },
+          { text: "价值", scores: { 忠诚: 3 } },
+          { text: "公平", scores: { 正义: 3 } },
+          { text: "刺激", scores: { 热情: 3 } },
+          { text: "和平", scores: { 骄傲: 3 } },
+          { text: "陪伴", scores: { 天真: 3 } },
+          { text: "认可", scores: { 不屈: 3 } }
+        ]
+      },
+      {
+        text: "XLV：OK啊家人们我实在编不下去了，因为这个代码是ai帮我写的所以这个分析是全看数值的，如果不是你想要的角色也别灰心，你多打几次说不定能刷出来（）那让我们3，2，1——",
+        options: [
+          { text: "查看结果", scores: {} }
+        ]
+      }
+    ];
+
+    const TOTAL = 45;
+    let current = 0;
+    const answers = new Array(TOTAL).fill(null);
+    const attrScores = {};
+
+    const quizWrap = document.getElementById("quizWrap");
+    const qIndexEl = document.getElementById("qIndex");
+    const qTextEl = document.getElementById("qText");
+    const optionsEl = document.getElementById("options");
+    const currentNumEl = document.getElementById("currentNum");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const progressFill = document.getElementById("progressFill");
+    const progressText = document.getElementById("progressText");
+    const backHome = document.getElementById("backHome");
+
+    let heightAnimationTimer = null;
+
+    function render() {
+      const isFirstRender = !quizWrap.dataset.initialized;
+
+      // 1. 记录当前高度并清理可能正在进行的动画
+      if (heightAnimationTimer) {
+        clearTimeout(heightAnimationTimer);
+        quizWrap.style.transition = 'none';
+        quizWrap.style.height = 'auto';
+        quizWrap.style.overflow = '';
+        heightAnimationTimer = null;
+      }
+      const firstHeight = isFirstRender ? 0 : quizWrap.offsetHeight;
+
+      // 2. 更新 DOM 内容
+      const q = QUESTIONS[current];
+      qIndexEl.textContent = String(current + 1).padStart(2, "0");
+      currentNumEl.textContent = current + 1;
+      qTextEl.textContent = q.text;
+
+      optionsEl.innerHTML = "";
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "option";
+        if (answers[current] === i) btn.classList.add("selected");
+
+        btn.innerHTML = `
+          <span class="mark">${String.fromCharCode(65 + i)}</span>
+          <span class="label">${opt.text}</span>
+        `;
+
+        btn.addEventListener("click", () => selectOption(i));
+        optionsEl.appendChild(btn);
+      });
+
+      prevBtn.disabled = current === 0;
+      nextBtn.textContent = current === TOTAL - 1 ? "FINALIZE // 提交" : "NEXT // 下一题";
+      updateProgress();
+
+      if (isFirstRender) {
+        quizWrap.dataset.initialized = "true";
+        return;
+      }
+
+      // 3. FLIP 动画：平滑改变外部框的高度
+      quizWrap.style.height = 'auto';
+      const lastHeight = quizWrap.offsetHeight;
+
+      quizWrap.style.height = firstHeight + 'px';
+      quizWrap.style.overflow = 'hidden';
+
+      void quizWrap.offsetHeight; // 强制重排
+
+      quizWrap.style.transition = 'height 0.35s cubic-bezier(0.22, 1, 0.36, 1)';
+      quizWrap.style.height = lastHeight + 'px';
+
+      heightAnimationTimer = setTimeout(() => {
+        quizWrap.style.transition = 'none';
+        quizWrap.style.height = 'auto';
+        quizWrap.style.overflow = '';
+        heightAnimationTimer = null;
+      }, 350);
+    }
+
+    function selectOption(index) {
+      const prev = answers[current];
+      if (prev !== null) {
+        applyScores(QUESTIONS[current].options[prev].scores, -1);
+      }
+      answers[current] = index;
+      applyScores(QUESTIONS[current].options[index].scores, 1);
+      render();
+    }
+
+    function applyScores(scores, sign) {
+      if (!scores) return;
+      for (const [key, value] of Object.entries(scores)) {
+        attrScores[key] = (attrScores[key] || 0) + value * sign;
+      }
+    }
+
+    function updateProgress() {
+      const answered = answers.filter((a) => a !== null).length;
+      const percent = (answered / TOTAL) * 100;
+      progressFill.style.width = percent + "%";
+      progressText.textContent = `${String(answered).padStart(2, '0')} / ${TOTAL}`;
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (current > 0) {
+        current--;
+        render();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (current < TOTAL - 1) {
+        current++;
+        render();
+      } else {
+        const firstUnanswered = answers.findIndex((a) => a === null);
+        if (firstUnanswered !== -1) {
+          alert(`INDEX ERROR // 第 ${firstUnanswered + 1} 题尚未归档，请返回作答。`);
+          current = firstUnanswered;
+          render();
+          return;
+        }
+        
+        console.log("最终属性分：", attrScores);
+        alert("已收集全部记录，即将跳转结果页。\n(请在控制台查看属性累计，或在此处接入后续页面)");
+        // window.location.href = "result.html";
+      }
+    });
+
+    backHome.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    render();
+  </script>
+</body>
+</html>
